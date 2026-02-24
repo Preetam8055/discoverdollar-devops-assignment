@@ -1,27 +1,173 @@
-In this DevOps task, you need to build and deploy a full-stack CRUD application using the MEAN stack (MongoDB, Express, Angular 15, and Node.js). The backend will be developed with Node.js and Express to provide REST APIs, connecting to a MongoDB database. The frontend will be an Angular application utilizing HTTPClient for communication.  
+# DevOps Assignment — Containerized Full Stack Deployment
 
-The application will manage a collection of tutorials, where each tutorial includes an ID, title, description, and published status. Users will be able to create, retrieve, update, and delete tutorials. Additionally, a search box will allow users to find tutorials by title.
+## Project Overview
 
-## Project setup
+This project demonstrates an end-to-end DevOps workflow:
 
-### Node.js Server
+* Run the application locally
+* Containerize using Docker
+* Configure multi-container setup using Docker Compose
+* Deploy to AWS EC2
+* Prepare for CI/CD automation
 
-cd backend
+The objective is to make the application production-ready and publicly accessible.
 
+---
+
+## Tech Stack
+
+| Layer            | Technology                             |
+| ---------------- | -------------------------------------- |
+| Frontend         | UI Provided                            |
+| Backend          | Node.js (Express)                      |
+| Database         | MySQL / MongoDB (update accordingly)   |
+| Containerization | Docker & Docker Compose                |
+| Cloud            | AWS EC2                                |
+| Automation       | GitHub Actions / Jenkins (in progress) |
+
+---
+
+## Deployment Steps Performed
+
+### 1. Run Application Locally
+
+Installed dependencies and started the backend server.
+
+```
 npm install
+npm start
+```
 
-You can update the MongoDB credentials by modifying the `db.config.js` file located in `app/config/`.
+Verified that the application UI loads in the browser.
 
-Run `node server.js`
+---
 
-### Angular Client
+### 2. Dockerization
 
-cd frontend
+Created a Dockerfile to containerize the backend:
 
-npm install
+* Used Node base image
+* Copied package files
+* Installed dependencies
+* Exposed application port
+* Started server
 
-Run `ng serve --port 8081`
+Build and run:
 
-You can modify the `src/app/services/tutorial.service.ts` file to adjust how the frontend interacts with the backend.
+```
+docker build -t app .
+docker run -p 3000:3000 app
+```
 
-Navigate to `http://localhost:8081/`
+---
+
+### 3. Multi-Container Setup (Docker Compose)
+
+Configured application and database containers.
+
+```
+docker-compose up --build
+```
+
+---
+
+### 4. Cloud Deployment (AWS EC2)
+
+Steps performed:
+
+1. Launched EC2 instance
+2. Installed Docker and Docker Compose
+3. Pulled project from GitHub
+4. Started containers
+5. Configured Security Group ports
+
+Application accessible at:
+
+```
+http://<EC2-Public-IP>:3000
+```
+
+---
+
+## Issue Faced
+
+### Problem
+
+The application UI loaded successfully but submitted data was not stored in the database.
+
+The issue occurred in:
+
+* Local environment
+* Docker containers
+* Cloud deployment
+
+---
+
+## Root Cause
+
+The backend could not communicate correctly with the database due to incorrect connection configuration.
+
+Containers were running correctly, but the database host configuration caused failed insert operations.
+
+---
+
+## Solution Implemented
+
+1. Added request logging to verify API call:
+
+```
+console.log(req.body);
+```
+
+2. Verified database connection status
+
+3. Corrected database host configuration:
+
+```
+localhost  -> incorrect inside container
+db         -> correct Docker service name
+```
+
+4. Restarted containers:
+
+```
+docker-compose down -v
+docker-compose up --build
+```
+
+After fix:
+
+* Data stored successfully
+* Working locally
+* Working in Docker
+* Working in EC2
+
+---
+
+## CI/CD (In Progress)
+
+Next steps:
+
+* Build Docker image automatically
+* Push image to registry
+* Deploy automatically to EC2
+
+---
+
+## Current Status
+
+| Stage              | Status      |
+| ------------------ | ----------- |
+| Local Run          | Completed   |
+| Dockerized         | Completed   |
+| Cloud Deploy       | Completed   |
+| Functional Testing | Completed   |
+| CI/CD Automation   | In Progress |
+
+---
+
+## Conclusion
+
+This project validates practical DevOps skills including debugging deployment issues, container networking, and preparing an application for automated production deployment.
+
+---
