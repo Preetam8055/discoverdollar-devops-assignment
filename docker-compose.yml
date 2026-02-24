@@ -1,26 +1,43 @@
-version: "3.8"
-
 services:
+
   mongodb:
     image: mongo:6
     container_name: mongodb
+    restart: always
     ports:
       - "27017:27017"
+    networks:
+      - mean-net
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/testdb --quiet
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   backend:
-    build: ./backend
+    image: preetam8055/mean-backend:latest
     container_name: backend
+    restart: always
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017/testdb
     ports:
       - "8080:8080"
-    depends_on:
-      - mongodb
-    environment:
-      - DB_HOST=mongodb
+    networks:
+      - mean-net
 
   frontend:
-    build: ./frontend
+    image: preetam8055/mean-frontend:latest
     container_name: frontend
-    ports:
-      - "8081:80"
+    restart: always
     depends_on:
       - backend
+    ports:
+      - "80:80"
+    networks:
+      - mean-net
+
+networks:
+  mean-net:
