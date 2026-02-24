@@ -1,5 +1,5 @@
-# Build Angular app
-FROM node:18 AS build
+# ---------- build angular ----------
+FROM node:18 AS builder
 
 WORKDIR /app
 
@@ -7,18 +7,10 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
-
 RUN npm run build -- --configuration production
 
-# Serve using nginx
+# ---------- nginx serve ----------
 FROM nginx:alpine
 
-# remove default nginx page
-RUN rm -rf /usr/share/nginx/html/*
-
-# copy angular build output
-COPY --from=build /app/dist/* /usr/share/nginx/html/
-
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
+COPY --from=builder /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
