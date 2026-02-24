@@ -40,7 +40,7 @@ db.mongoose
 
 // Test
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to Test application." });
+ res.json({ message: "Welcome to Preetam DevOps Project" });
 });
 
 require("./app/routes/turorial.routes")(app);
